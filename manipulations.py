@@ -48,11 +48,13 @@ def get_classes(input_directory,files):
 
     return sorted(set(classes))
 
-def get_classes_from_header(header_data):
+def get_classes_from_header(header_data,verbose=False):
     classes = []
     for lines in header_data:
-        if lines.startswith('#Dx'):
+        if lines.startswith('# Dx'):
             tmp = lines.split(': ')[1].split(',')
+            if verbose:
+                print(tmp)
             for c in tmp:
                 classes.append(int(c.strip()))
     return sorted(classes)
@@ -85,6 +87,8 @@ def cv_split(headers_datasets, i_fold=0):
     """
     80-20 stratified CV split across each dataset
     """
+
+
     
     Codes = []
     
@@ -100,11 +104,21 @@ def cv_split(headers_datasets, i_fold=0):
         print('Dataset ', dataset)
         headers_dataset = headers_datasets[dataset]
         num_files = len(headers_dataset)
+        print("num_files:",num_files)
         dataset_idx[dataset] = []
         dataset_data_labels[dataset] = []
         for i, header_data in tqdm(enumerate(headers_dataset), disable=disable_tqdm):
-            
-            codes = get_classes_from_header(header_data)
+            verbose=False
+            if i<3:
+                print(header_data)
+
+                verbose = True
+
+            codes = get_classes_from_header(header_data,verbose=verbose)
+            if i<3:
+
+                print(codes)
+
             filename = header_data[0].split(' ')[0].split('.')[0]
             data_labels = get_scored_class(codes, labels)
 
@@ -115,7 +129,7 @@ def cv_split(headers_datasets, i_fold=0):
             dataset_idx[dataset].append(global_idx)
             global_idx += 1
         
-        kf = MultilabelStratifiedKFold(5, random_state=0)
+        kf = MultilabelStratifiedKFold(5)#, random_state=0)
         kf_splits = kf.split(np.array(dataset_data_labels[dataset]), np.array(dataset_data_labels[dataset]))
         train_idx = None
         test_idx = None

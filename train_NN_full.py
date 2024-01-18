@@ -1,4 +1,4 @@
-
+import sys
 from manipulations import get_scored_class, get_name, cv_split
 from global_vars import labels, equivalent_mapping, Dx_map, Dx_map_unscored, \
     normal_class, weights, disable_tqdm, enable_writer, run_name, n_segments, max_segment_len
@@ -28,12 +28,17 @@ def train_NN_sig_MIL_full(headers_datasets, output_directory, fDatas):
 
     Codes, dataset_train_idx, dataset_test_idx, filenames = cv_split(headers_datasets)
 
+    print("len Codes:",len(Codes))
+    print(" Codes:",Codes[:3])
+    print("dataset_test_idx:",dataset_test_idx)
+
     datasets = np.sort(list(headers_datasets.keys()))
 
     # agg labels
     data_img2_labels = []
     for i in tqdm(range(len(Codes)), disable=disable_tqdm):
         data_img2_labels.append(get_scored_class(Codes[i], labels))
+    #print("data_img2_labels",data_img2_labels)
     data_img2_labels = np.array(data_img2_labels)
     assert len(data_img2_labels) == len(Codes)
 
@@ -52,6 +57,9 @@ def train_NN_sig_MIL_full(headers_datasets, output_directory, fDatas):
     names = [get_name(label, Dx_map, Dx_map_unscored) for label in labels]
     class_idx = np.argwhere(np.sum(np.array(data_img2_labels),axis=0)!=0).flatten() 
     names = np.array(names)[class_idx]
+    print("names:",names)
+    print("class_idx",class_idx)
+    print("labels:",labels)
     normal_idx = np.argwhere(labels[class_idx]==int(normal_class)).flatten()[0]
 
     print("#classes: ", len(class_idx), "data_img2_labels.dim", data_img2_labels.shape)
@@ -98,9 +106,9 @@ def train_NN_sig_MIL_full(headers_datasets, output_directory, fDatas):
     if enable_writer:
         writer = SummaryWriter(output_directory+'/runs/{}'.format(run_name))
 
-
+    #sys.exit()
     # training
-    for epoch in range(0, 41):
+    for epoch in range(0, 15):#41):
 
         model.train()
 
@@ -185,7 +193,7 @@ def train_NN_sig_MIL_full(headers_datasets, output_directory, fDatas):
         with open(output_directory+'/loss_{}.txt'.format(run_name), 'a') as f:
             print(output_str, file=f)
 
-        if epoch == 40:
+        if epoch>1:
             torch.save(model.state_dict(), 
                 '{}/{}_model_final_{}.dict'.format(output_directory, run_name, epoch))
 

@@ -25,6 +25,7 @@ for ll in leads:
 		headers.append('{}_{}'.format(ll, lfn))
 
 #labels = ['AF', 'I-AVB', 'LBBB', 'Normal', 'PAC', 'PVC', 'RBBB', 'STD', 'STE']
+print("headers",headers)
 
 import pandas as pd
 weights_csv = pd.read_csv('weights.csv')
@@ -34,9 +35,14 @@ weights = weights_csv.iloc[:,1:].to_numpy()
 # weights = weights_csv.iloc[sorted_idx,sorted_idx+1].to_numpy()
 # columns = np.array(columns)[sorted_idx]
 
+print("columns:",columns)
+print("weights:",weights)
+
 Dx_map = pd.read_csv('dx_mapping_scored.csv')
 Dx_map_unscored = pd.read_csv('dx_mapping_unscored.csv')
 labels = Dx_map['SNOMED CT Code'].to_numpy()
+
+print("labels:",labels)
 
 # equivalent_mapping
 equivalent_mapping = {}
@@ -45,6 +51,7 @@ for class1, class2 in equivalent_classes:
     
 normal_idx = np.argwhere(labels==int(normal_class))
 
+print("normal_idx:",normal_idx)
 
 disable_tqdm = True
 enable_writer = False

@@ -17,7 +17,10 @@ def train_12ECG_classifier(input_directory, output_directory):
         if not f.lower().startswith('.') and f.lower().endswith('hea') and os.path.isfile(g):
             header_files.append(g)
 
+
+    #print(header_files)
     num_files = len(header_files)
+    #print(num_files)
 
     headers = list()
     for i in range(num_files):
@@ -28,9 +31,21 @@ def train_12ECG_classifier(input_directory, output_directory):
     print('Split dataset...')
     headers_datasets = get_dataset(headers)
 
+    print("headers_datasets")
+    i = 0
+    for item in headers_datasets:
+        for x in headers_datasets[item]:
+
+            print(x)
+            i = i + 1
+            if i>3:
+                break
+
+
     # make cwt
     print('Read signal ...')
     fDatas = read_signal(input_directory, headers_datasets, output_directory)
+    #print(fDatas)
 
     assert len(fDatas) == len(headers)
     del headers, header_files, num_files

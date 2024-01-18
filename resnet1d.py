@@ -245,7 +245,8 @@ class ECGBagResNet(nn.Module):
     """
     
     def __init__(self, in_channels, n_classes, n_segments, n=3,
-            blocks_sizes=[64, 128, 128], verbose=False):
+            #blocks_sizes=[64, 128, 128], verbose=False):
+            blocks_sizes=[32, 64, 64], verbose=False):
         super().__init__()
         encoder_dim = blocks_sizes[-1]
         D = encoder_dim//2
@@ -264,7 +265,8 @@ class ECGBagResNet(nn.Module):
             nn.Linear(D, K)
         )
         # ll.bias = nn.Parameter(init_bias)
-        self.decoder = nn.Linear(4096, n_classes)
+        #self.decoder = nn.Linear(4096, n_classes)
+        self.decoder = nn.Linear(1024, n_classes)
         #self.decoder = nn.Linear(16384, n_classes) #
 
         self.verbose = verbose
