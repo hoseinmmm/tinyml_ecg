@@ -68,7 +68,8 @@ if __name__ == '__main__':
 
     testing_files = []
     if testing:
-        from train_NN_sig_only import cv_split, get_dataset
+        #from train_NN_sig_only import cv_split, get_dataset
+        from manipulations import cv_split, get_dataset
         from train_12ECG_classifier import load_challenge_header
         header_files = []
         for f in os.listdir(input_directory):
@@ -103,7 +104,8 @@ if __name__ == '__main__':
         current_label, current_score,classes = run_12ECG_classifier(data,header_data, model)
         # Save results.
         save_challenge_predictions(output_directory,f,current_score,current_label,classes)
-        if testing:
+        #if testing:
+        if False:
             copyfile(input_directory+'/'+f, 'input_testing/'+f)
             f = f[:-4]+'.hea'
             copyfile(input_directory+'/'+f, 'input_testing/'+f)

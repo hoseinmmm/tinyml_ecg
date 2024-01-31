@@ -59,6 +59,10 @@ run_name_base = 'ECGBagResNet_trial0_MIL_5segs_3000len_pos2_fixed_balanced_fulls
 run_name = run_name_base
 n_segments = 5
 max_segment_len = 3000
+epoches = 15
 
+
+subset_classes = 8 # max is 27, becasue we trained with a subset of data, our model does not have all classes
+labels =  [270492004, 164889003, 713427006, 164909002, 284470004,  59118001, 426783006,  63593006]
 
 

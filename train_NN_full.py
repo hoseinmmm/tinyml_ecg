@@ -1,7 +1,7 @@
 import sys
 from manipulations import get_scored_class, get_name, cv_split
 from global_vars import labels, equivalent_mapping, Dx_map, Dx_map_unscored, \
-    normal_class, weights, disable_tqdm, enable_writer, run_name, n_segments, max_segment_len
+    normal_class, weights, disable_tqdm, enable_writer, run_name, n_segments, max_segment_len, epoches
 from resnet1d import ECGBagResNet
 from dataset import BagSigDataset
 from myeval import agg_y_preds_bags, binary_acc, geometry_loss, compute_score
@@ -108,7 +108,7 @@ def train_NN_sig_MIL_full(headers_datasets, output_directory, fDatas):
 
     #sys.exit()
     # training
-    for epoch in range(0, 15):#41):
+    for epoch in range(0, epoches):#41):
 
         model.train()
 

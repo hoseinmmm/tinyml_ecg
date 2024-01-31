@@ -7,12 +7,13 @@ if __name__ == '__main__':
     # Parse arguments.
     input_directory = sys.argv[1]
     output_directory = sys.argv[2]
+    model_name = sys.argv[3] # model
 
     if not os.path.isdir(output_directory):
         os.mkdir(output_directory)
 
-    print('Running training code...')
+    print(f'Running training code for {model_name}...')
 
-    train_12ECG_classifier(input_directory, output_directory)
+    train_12ECG_classifier(input_directory, output_directory,model_name)
 
     print('Done.')

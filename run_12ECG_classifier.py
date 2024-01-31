@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np, os, sys
-from global_vars import labels, run_name, n_segments, max_segment_len
+from global_vars import labels, run_name, n_segments, max_segment_len, epoches, subset_classes
 from get_12ECG_features import get_12ECG_features
 from resnet1d import ECGBagResNet
 import torch
@@ -53,8 +53,9 @@ def run_12ECG_classifier(data,header_data,loaded_model):
 
 def load_trained_model(model_saved_path):
     model = ECGBagResNet(12, len(labels), n_segments).to(device)
+    #model = ECGBagResNet(12, subset_classes, n_segments).to(device)
     # load saved model
-    model.load_state_dict(torch.load(model_saved_path+'/{}_model_final_40.dict'.format(run_name)))#, map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load(model_saved_path+'/{}_model_final_{}.dict'.format(run_name,epoches-1)))#, map_location=torch.device('cpu')))
     return model
 
 def load_12ECG_model(input_directory):
