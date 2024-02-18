@@ -8,7 +8,7 @@ from train_NN_sig_MIL import train_NN_sig_MIL
 from manipulations import get_dataset
 from train_sklearn import train_sklearn
 
-def train_12ECG_classifier(input_directory, output_directory,model_name):
+def train_12ECG_classifier(input_directory, output_directory,model_name,train_en,binary_class,raw_en):
     # Load data.
     print('Loading data...')
 
@@ -51,9 +51,9 @@ def train_12ECG_classifier(input_directory, output_directory,model_name):
     assert len(fDatas) == len(headers)
     del headers, header_files, num_files
 
-    if model_name == 'rf':
-        print('Training RF ... ')
-        train_sklearn(headers_datasets, output_directory, fDatas)
+    if (model_name != 'nn'):
+        print('Training SK ... ')
+        train_sklearn(headers_datasets, output_directory, fDatas,model_name,train_en,binary_class,raw_en)
     else:
         # train and save the best model
         print('Training NN ... ')

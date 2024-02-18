@@ -2,7 +2,10 @@
 
 import numpy as np, os, sys
 from scipy.io import loadmat
-from run_12ECG_classifier import load_12ECG_model, run_12ECG_classifier
+from run_12ECG_classifier import load_12ECG_model, run_12ECG_classifier, load_12ECG_model_rf, run_12ECG_classifier_rf
+from signal_processing import read_signal
+from manipulations import get_dataset
+
 testing = True
 if testing:
     from shutil import copyfile
@@ -35,6 +38,9 @@ def save_challenge_predictions(output_directory,filename,scores,labels,classes):
     label_string = ','.join(str(i) for i in labels)
     score_string = ','.join(str(i) for i in scores)
 
+    if not os.path.isdir(output_directory):
+        os.mkdir(output_directory)
+
     with open(output_file, 'w') as f:
         f.write(recording_string + '\n' + class_string + '\n' + label_string + '\n' + score_string + '\n')
 
@@ -42,12 +48,13 @@ def save_challenge_predictions(output_directory,filename,scores,labels,classes):
 
 if __name__ == '__main__':
     # Parse arguments.
-    if len(sys.argv) != 4:
-        raise Exception('Include the model, input and output directories as arguments, e.g., python driver.py model input output.')
+    if len(sys.argv) != 5:
+        raise Exception('Include the model, input and output directories as arguments, e.g., python driver.py model input output model_name.')
 
     model_input = sys.argv[1]
     input_directory = sys.argv[2]
     output_directory = sys.argv[3]
+    model_name = sys.argv[4]
 
     # Find files.
     input_files = []
@@ -59,55 +66,66 @@ if __name__ == '__main__':
         os.mkdir(output_directory)
 
     # Load model.
-    print('Loading 12ECG model...')
-    model = load_12ECG_model(model_input)
+    if model_name == "rf":
+        print('Loading 12ECG RF model...')
+        model = load_12ECG_model_rf(model_input)
+    else:
+        print('Loading 12ECG NN model...')
+        model = load_12ECG_model(model_input)
 
     # Iterate over files.
     print('Extracting 12ECG features...')
     num_files = len(input_files)
 
-    testing_files = []
-    if testing:
-        #from train_NN_sig_only import cv_split, get_dataset
-        from manipulations import cv_split, get_dataset
-        from train_12ECG_classifier import load_challenge_header
-        header_files = []
-        for f in os.listdir(input_directory):
-            g = os.path.join(input_directory, f)
-            if not f.lower().startswith('.') and f.lower().endswith('hea') and os.path.isfile(g):
-                header_files.append(g)
-
-        headers = list()
-        for i in range(num_files):
-            header = load_challenge_header(header_files[i])
-            headers.append(header)
-
-        headers_datasets = get_dataset(headers, None)
-        _, _, dataset_test_idx, filenames = cv_split(headers_datasets)
-
-
-        # agg CV split
-        datasets = np.sort(list(headers_datasets.keys()))
-        for dataset in datasets:
-            for idx in dataset_test_idx[dataset]:
-                testing_files.append(filenames[idx])
-
-        del headers_datasets, headers, header_files
-
-    print("testing_files", len(testing_files))
-    for i, f in tqdm(enumerate(testing_files)):
-        #print(f)
+    if True:
         
-        f = f+'.mat'
-        tmp_input_file = os.path.join(input_directory,f)
-        data,header_data = load_challenge_data(tmp_input_file)
-        current_label, current_score,classes = run_12ECG_classifier(data,header_data, model)
-        # Save results.
-        save_challenge_predictions(output_directory,f,current_score,current_label,classes)
-        #if testing:
-        if False:
-            copyfile(input_directory+'/'+f, 'input_testing/'+f)
-            f = f[:-4]+'.hea'
-            copyfile(input_directory+'/'+f, 'input_testing/'+f)
+        # original
+        testing_files = []
+        if testing:
+            #from train_NN_sig_only import cv_split, get_dataset
+            from manipulations import cv_split, get_dataset
+            from train_12ECG_classifier import load_challenge_header
+            header_files = []
+            for f in os.listdir(input_directory):
+                g = os.path.join(input_directory, f)
+                if not f.lower().startswith('.') and f.lower().endswith('hea') and os.path.isfile(g):
+                    header_files.append(g)
+
+            headers = list()
+            for i in range(num_files):
+                header = load_challenge_header(header_files[i])
+                headers.append(header)
+
+            headers_datasets = get_dataset(headers, None)
+            _, _, dataset_test_idx, filenames = cv_split(headers_datasets)
+
+
+            # agg CV split
+            datasets = np.sort(list(headers_datasets.keys()))
+            for dataset in datasets:
+                for idx in dataset_test_idx[dataset]:
+                    testing_files.append(filenames[idx])
+
+            del headers_datasets, headers, header_files
+
+
+        print("testing_files", len(testing_files))
+        for i, f in tqdm(enumerate(testing_files)):
+            #print(f)
+            
+            f = f+'.mat'
+            tmp_input_file = os.path.join(input_directory,f)
+            data,header_data = load_challenge_data(tmp_input_file)
+            if model_name=='rf':
+                current_label, current_score,classes = run_12ECG_classifier_rf(data,header_data, model)
+            else:
+                current_label, current_score,classes = run_12ECG_classifier(data,header_data, model)
+            # Save results.
+            save_challenge_predictions(output_directory,f,current_score,current_label,classes)
+            #if testing:
+            if False:
+                copyfile(input_directory+'/'+f, 'input_testing/'+f)
+                f = f[:-4]+'.hea'
+                copyfile(input_directory+'/'+f, 'input_testing/'+f)
 
     print('Done.')
