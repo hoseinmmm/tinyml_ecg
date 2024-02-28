@@ -9,7 +9,6 @@ saved/*
 input*
 *.txt
 *.pyc
-*.csv
 *.pkl
 *.npy
 *.png

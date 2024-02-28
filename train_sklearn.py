@@ -13,8 +13,8 @@ def process_dataset(dataset):
     from scipy.stats import mode
     from scipy.ndimage.filters import gaussian_filter1d
     data_point_num = 0
-    # Initialize the 2D dataset with zeros, now with 12*(6+50) features for each sample
-    processed_dataset = np.zeros((dataset.shape[0], 12 * (6 + data_point_num)))  # 12 features, (6 stats + 50 time points) each
+    # Initialize the 2D dataset with zeros, now with 12*(6+data_point_num) features for each sample
+    processed_dataset = np.zeros((dataset.shape[0], 12 * (6 + data_point_num)))  # 12 features, (6 stats + data_point_num time points) each
     
     for sample_idx in range(dataset.shape[0]):
         for feature_idx in range(dataset.shape[1]):
